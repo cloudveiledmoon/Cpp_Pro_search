@@ -1,0 +1,1 @@
+/usr/bin/c++ CMakeFiles/server.dir/main.cc.o CMakeFiles/server.dir/KeywordProcessor.cc.o CMakeFiles/server.dir/DirectoryScanner.cc.o -o server  -lmuduo_net -lmuduo_base -lpthread 

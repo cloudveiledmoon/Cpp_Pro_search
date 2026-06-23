@@ -1,0 +1,3 @@
+/home/zhr/prosearch/build/CMakeFiles/server.dir
+/home/zhr/prosearch/build/CMakeFiles/edit_cache.dir
+/home/zhr/prosearch/build/CMakeFiles/rebuild_cache.dir
