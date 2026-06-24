@@ -1,0 +1,29 @@
+# 忽略整个 build 文件夹
+build/*
+
+# 忽略整个 data 文件夹
+data/dict/*
+
+data/index/*
+
+stopwords/*
+
+corpus/CN/*
+
+corpus/EN/*
+
+corpus/webpages/*
+
+!build/.gitkeep
+
+!data/dict/.gitkeep
+
+!data/index/.gitkeep
+
+!stopwords/.gitkeep
+
+!corpus/CN/.gitkeep
+
+!corpus/EN/.gitkeep
+
+!corpus/webpages/.gitkeep
