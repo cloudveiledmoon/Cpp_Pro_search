@@ -177,6 +177,30 @@ KeywordProcessor.cc.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/server.dir/build.make CMakeFiles/server.dir/KeywordProcessor.cc.s
 .PHONY : KeywordProcessor.cc.s
 
+PageProcessor.o: PageProcessor.cc.o
+.PHONY : PageProcessor.o
+
+# target to build an object file
+PageProcessor.cc.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/server.dir/build.make CMakeFiles/server.dir/PageProcessor.cc.o
+.PHONY : PageProcessor.cc.o
+
+PageProcessor.i: PageProcessor.cc.i
+.PHONY : PageProcessor.i
+
+# target to preprocess a source file
+PageProcessor.cc.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/server.dir/build.make CMakeFiles/server.dir/PageProcessor.cc.i
+.PHONY : PageProcessor.cc.i
+
+PageProcessor.s: PageProcessor.cc.s
+.PHONY : PageProcessor.s
+
+# target to generate assembly for a file
+PageProcessor.cc.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/server.dir/build.make CMakeFiles/server.dir/PageProcessor.cc.s
+.PHONY : PageProcessor.cc.s
+
 main.o: main.cc.o
 .PHONY : main.o
 
@@ -216,6 +240,9 @@ help:
 	@echo "... KeywordProcessor.o"
 	@echo "... KeywordProcessor.i"
 	@echo "... KeywordProcessor.s"
+	@echo "... PageProcessor.o"
+	@echo "... PageProcessor.i"
+	@echo "... PageProcessor.s"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"

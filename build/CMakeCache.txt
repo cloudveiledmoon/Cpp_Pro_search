@@ -224,6 +224,9 @@ REQUIRED_DIR:PATH=REQUIRED_DIR-NOTFOUND
 //The directory containing a CMake configuration file for muduo.
 muduo_DIR:PATH=muduo_DIR-NOTFOUND
 
+//The directory containing a CMake configuration file for tinyxml2.
+tinyxml2_DIR:PATH=/usr/local/lib/cmake/tinyxml2
+
 
 ########################
 # INTERNAL cache entries
