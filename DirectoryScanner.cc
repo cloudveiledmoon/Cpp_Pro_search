@@ -29,8 +29,11 @@ std::vector<std::string> DirectoryScanner::scan(const std::string& path){
     {return {};}
     std::vector<std::string> files;
     while(auto name=readdir(dir_fd)){
+
         if(name->d_type==DT_REG)
         {
+            if(name->d_name[0]=='.')
+            {continue;}
             files.push_back(name->d_name);
         }else {
             continue;
