@@ -115,7 +115,6 @@ void PageProcessor::build_inevrted_index(const std::string &filename){
             }
         }
 
-
         map<int,map<string,double>> tf_dic;//每个文档的词频
         for(auto& doc:book){ 
             for(auto & item:doc.second){
@@ -139,7 +138,7 @@ void PageProcessor::build_inevrted_index(const std::string &filename){
        
         for(auto &doc:book){ 
             map<string,double> tf_idf;//tf-idf关键字权重
-             double sqr_sum=0;
+            double sqr_sum=0;
             for(auto &keyword:doc.second){
                 tf_idf[keyword.first]=tf_dic[doc.first][keyword.first]*idf_dic[keyword.first];
                 sqr_sum+=pow(tf_idf[keyword.first],2);

@@ -11,14 +11,14 @@ class PageProcessor
 public:
     PageProcessor();
     void process(const std::string &dir);
-
+    bool is_chinese_token(const std::string& token);
 private:
     void build_pages_and_offsets(const std::string &pagename,const std::string &offsets);
 
     void build_inevrted_index(const std::string &filename);
 
     void build_simhash();
-    bool is_chinese_token(const std::string& token);
+    
     int hamming_distance(const uint64_t &a, const uint64_t &b);
 
     void xml_to_documents(const std::string &filename,int &id);
