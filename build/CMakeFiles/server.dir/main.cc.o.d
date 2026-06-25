@@ -278,4 +278,167 @@ CMakeFiles/server.dir/main.cc.o: /home/zhr/prosearch/main.cc \
  /usr/include/x86_64-linux-gnu/bits/signal_ext.h \
  /usr/include/x86_64-linux-gnu/bits/param.h /usr/include/linux/param.h \
  /usr/include/x86_64-linux-gnu/asm/param.h \
- /usr/include/asm-generic/param.h
+ /usr/include/asm-generic/param.h /home/zhr/prosearch/serverMine.h \
+ /usr/local/include/muduo/net/EventLoop.h /usr/include/c++/11/atomic \
+ /usr/include/c++/11/bits/atomic_base.h \
+ /usr/include/c++/11/bits/atomic_lockfree_defines.h \
+ /usr/include/boost/any.hpp /usr/include/boost/config.hpp \
+ /usr/include/boost/config/user.hpp \
+ /usr/include/boost/config/detail/select_compiler_config.hpp \
+ /usr/include/boost/config/compiler/gcc.hpp /usr/include/c++/11/cstddef \
+ /usr/include/boost/config/detail/select_stdlib_config.hpp \
+ /usr/include/c++/11/version \
+ /usr/include/boost/config/stdlib/libstdcpp3.hpp \
+ /usr/include/boost/config/detail/select_platform_config.hpp \
+ /usr/include/boost/config/platform/linux.hpp \
+ /usr/include/boost/config/detail/posix_features.hpp \
+ /usr/include/boost/config/detail/suffix.hpp \
+ /usr/include/boost/config/helper_macros.hpp \
+ /usr/include/boost/type_index.hpp \
+ /usr/include/boost/type_index/stl_type_index.hpp \
+ /usr/include/boost/type_index/type_index_facade.hpp \
+ /usr/include/boost/container_hash/hash_fwd.hpp \
+ /usr/include/boost/config/workaround.hpp \
+ /usr/include/boost/static_assert.hpp \
+ /usr/include/boost/detail/workaround.hpp \
+ /usr/include/boost/throw_exception.hpp \
+ /usr/include/boost/assert/source_location.hpp \
+ /usr/include/boost/current_function.hpp /usr/include/boost/cstdint.hpp \
+ /usr/include/boost/exception/exception.hpp \
+ /usr/include/boost/core/demangle.hpp /usr/include/c++/11/cxxabi.h \
+ /usr/include/x86_64-linux-gnu/c++/11/bits/cxxabi_tweaks.h \
+ /usr/include/boost/type_traits/conditional.hpp \
+ /usr/include/boost/type_traits/is_const.hpp \
+ /usr/include/boost/type_traits/integral_constant.hpp \
+ /usr/include/boost/type_traits/is_reference.hpp \
+ /usr/include/boost/type_traits/is_lvalue_reference.hpp \
+ /usr/include/boost/type_traits/is_rvalue_reference.hpp \
+ /usr/include/boost/type_traits/is_volatile.hpp \
+ /usr/include/boost/type_traits/remove_cv.hpp \
+ /usr/include/boost/type_traits/remove_reference.hpp \
+ /usr/include/boost/type_traits/decay.hpp \
+ /usr/include/boost/type_traits/is_array.hpp \
+ /usr/include/boost/type_traits/is_function.hpp \
+ /usr/include/boost/type_traits/detail/config.hpp \
+ /usr/include/boost/version.hpp \
+ /usr/include/boost/type_traits/detail/is_function_cxx_11.hpp \
+ /usr/include/boost/type_traits/remove_bounds.hpp \
+ /usr/include/boost/type_traits/remove_extent.hpp \
+ /usr/include/boost/type_traits/add_pointer.hpp \
+ /usr/include/boost/type_traits/add_reference.hpp \
+ /usr/include/boost/utility/enable_if.hpp \
+ /usr/include/boost/core/enable_if.hpp \
+ /usr/include/boost/core/addressof.hpp \
+ /usr/include/boost/type_traits/is_same.hpp \
+ /usr/local/include/muduo/base/Mutex.h \
+ /usr/local/include/muduo/base/CurrentThread.h \
+ /usr/local/include/muduo/base/Types.h \
+ /usr/local/include/muduo/base/noncopyable.h \
+ /usr/local/include/muduo/base/Timestamp.h \
+ /usr/local/include/muduo/base/copyable.h \
+ /usr/include/boost/operators.hpp \
+ /usr/local/include/muduo/net/Callbacks.h /usr/include/c++/11/memory \
+ /usr/include/c++/11/bits/stl_raw_storage_iter.h \
+ /usr/include/c++/11/bits/align.h /usr/include/c++/11/bit \
+ /usr/include/c++/11/bits/shared_ptr.h \
+ /usr/include/c++/11/bits/shared_ptr_base.h \
+ /usr/include/c++/11/bits/allocated_ptr.h \
+ /usr/include/c++/11/ext/concurrence.h \
+ /usr/include/c++/11/bits/shared_ptr_atomic.h \
+ /usr/include/c++/11/backward/auto_ptr.h \
+ /usr/include/c++/11/pstl/glue_memory_defs.h \
+ /usr/local/include/muduo/net/TimerId.h \
+ /usr/local/include/muduo/net/InetAddress.h \
+ /usr/local/include/muduo/base/StringPiece.h /usr/include/netinet/in.h \
+ /usr/include/x86_64-linux-gnu/sys/socket.h \
+ /usr/include/x86_64-linux-gnu/bits/types/struct_iovec.h \
+ /usr/include/x86_64-linux-gnu/bits/socket.h \
+ /usr/include/x86_64-linux-gnu/bits/socket_type.h \
+ /usr/include/x86_64-linux-gnu/bits/sockaddr.h \
+ /usr/include/x86_64-linux-gnu/asm/socket.h \
+ /usr/include/asm-generic/socket.h /usr/include/linux/posix_types.h \
+ /usr/include/linux/stddef.h \
+ /usr/include/x86_64-linux-gnu/asm/posix_types.h \
+ /usr/include/x86_64-linux-gnu/asm/posix_types_64.h \
+ /usr/include/asm-generic/posix_types.h \
+ /usr/include/x86_64-linux-gnu/asm/bitsperlong.h \
+ /usr/include/asm-generic/bitsperlong.h \
+ /usr/include/x86_64-linux-gnu/asm/sockios.h \
+ /usr/include/asm-generic/sockios.h \
+ /usr/include/x86_64-linux-gnu/bits/types/struct_osockaddr.h \
+ /usr/include/x86_64-linux-gnu/bits/in.h \
+ /usr/local/include/muduo/net/TcpServer.h \
+ /usr/local/include/muduo/base/Atomic.h \
+ /usr/local/include/muduo/net/TcpConnection.h \
+ /usr/local/include/muduo/net/Buffer.h \
+ /usr/local/include/muduo/net/Endian.h \
+ /usr/local/include/nlohmann/json.hpp \
+ /usr/local/include/nlohmann/adl_serializer.hpp \
+ /usr/local/include/nlohmann/detail/abi_macros.hpp \
+ /usr/local/include/nlohmann/detail/conversions/from_json.hpp \
+ /usr/include/c++/11/forward_list /usr/include/c++/11/bits/forward_list.h \
+ /usr/include/c++/11/bits/forward_list.tcc /usr/include/c++/11/valarray \
+ /usr/include/c++/11/bits/valarray_array.h \
+ /usr/include/c++/11/bits/valarray_array.tcc \
+ /usr/include/c++/11/bits/valarray_before.h \
+ /usr/include/c++/11/bits/slice_array.h \
+ /usr/include/c++/11/bits/valarray_after.h \
+ /usr/include/c++/11/bits/gslice.h \
+ /usr/include/c++/11/bits/gslice_array.h \
+ /usr/include/c++/11/bits/mask_array.h \
+ /usr/include/c++/11/bits/indirect_array.h \
+ /usr/local/include/nlohmann/detail/exceptions.hpp \
+ /usr/local/include/nlohmann/detail/value_t.hpp \
+ /usr/local/include/nlohmann/detail/macro_scope.hpp \
+ /usr/local/include/nlohmann/detail/meta/detected.hpp \
+ /usr/local/include/nlohmann/detail/meta/void_t.hpp \
+ /usr/local/include/nlohmann/thirdparty/hedley/hedley.hpp \
+ /usr/local/include/nlohmann/detail/string_escape.hpp \
+ /usr/local/include/nlohmann/detail/input/position_t.hpp \
+ /usr/local/include/nlohmann/detail/meta/cpp_future.hpp \
+ /usr/local/include/nlohmann/detail/meta/type_traits.hpp \
+ /usr/local/include/nlohmann/detail/iterators/iterator_traits.hpp \
+ /usr/local/include/nlohmann/detail/meta/call_std/begin.hpp \
+ /usr/local/include/nlohmann/detail/meta/call_std/end.hpp \
+ /usr/local/include/nlohmann/json_fwd.hpp \
+ /usr/local/include/nlohmann/detail/string_concat.hpp \
+ /usr/local/include/nlohmann/detail/meta/identity_tag.hpp \
+ /usr/local/include/nlohmann/detail/meta/std_fs.hpp \
+ /usr/include/c++/11/filesystem /usr/include/c++/11/bits/fs_fwd.h \
+ /usr/include/c++/11/chrono /usr/include/c++/11/ratio \
+ /usr/include/c++/11/bits/parse_numbers.h \
+ /usr/include/c++/11/bits/fs_path.h /usr/include/c++/11/iomanip \
+ /usr/include/c++/11/bits/quoted_string.h /usr/include/c++/11/codecvt \
+ /usr/include/c++/11/bits/fs_dir.h /usr/include/c++/11/bits/fs_ops.h \
+ /usr/local/include/nlohmann/detail/meta/logic.hpp \
+ /usr/include/c++/11/optional \
+ /usr/local/include/nlohmann/detail/conversions/to_json.hpp \
+ /usr/local/include/nlohmann/detail/iterators/iteration_proxy.hpp \
+ /usr/local/include/nlohmann/detail/string_utils.hpp \
+ /usr/local/include/nlohmann/byte_container_with_subtype.hpp \
+ /usr/local/include/nlohmann/detail/hash.hpp \
+ /usr/local/include/nlohmann/detail/input/binary_reader.hpp \
+ /usr/local/include/nlohmann/detail/input/input_adapters.hpp \
+ /usr/include/c++/11/numeric /usr/include/c++/11/bits/stl_numeric.h \
+ /usr/include/c++/11/pstl/glue_numeric_defs.h \
+ /usr/local/include/nlohmann/detail/input/json_sax.hpp \
+ /usr/local/include/nlohmann/detail/input/lexer.hpp \
+ /usr/local/include/nlohmann/detail/meta/is_sax.hpp \
+ /usr/local/include/nlohmann/detail/input/parser.hpp \
+ /usr/local/include/nlohmann/detail/iterators/internal_iterator.hpp \
+ /usr/local/include/nlohmann/detail/iterators/primitive_iterator.hpp \
+ /usr/local/include/nlohmann/detail/iterators/iter_impl.hpp \
+ /usr/local/include/nlohmann/detail/iterators/json_reverse_iterator.hpp \
+ /usr/local/include/nlohmann/detail/json_custom_base_class.hpp \
+ /usr/local/include/nlohmann/detail/json_pointer.hpp \
+ /usr/local/include/nlohmann/detail/json_ref.hpp \
+ /usr/local/include/nlohmann/detail/output/binary_writer.hpp \
+ /usr/local/include/nlohmann/detail/output/output_adapters.hpp \
+ /usr/local/include/nlohmann/detail/output/serializer.hpp \
+ /usr/local/include/nlohmann/detail/conversions/to_chars.hpp \
+ /usr/local/include/nlohmann/ordered_map.hpp /usr/include/c++/11/any \
+ /usr/local/include/nlohmann/detail/macro_unscope.hpp \
+ /usr/local/include/nlohmann/thirdparty/hedley/hedley_undef.hpp \
+ /home/zhr/prosearch/MessageCodec.h \
+ /usr/local/include/muduo/base/Logging.h \
+ /usr/local/include/muduo/base/LogStream.h

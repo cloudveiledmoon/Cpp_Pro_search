@@ -9,6 +9,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/server.dir/PageProcessor.cc.o.d"
   "CMakeFiles/server.dir/main.cc.o"
   "CMakeFiles/server.dir/main.cc.o.d"
+  "CMakeFiles/server.dir/serverMine.cc.o"
+  "CMakeFiles/server.dir/serverMine.cc.o.d"
 )
 
 # Per-language clean rules from dependency scanning.

@@ -1,1 +1,1 @@
-/usr/bin/c++ CMakeFiles/server.dir/main.cc.o CMakeFiles/server.dir/KeywordProcessor.cc.o CMakeFiles/server.dir/DirectoryScanner.cc.o CMakeFiles/server.dir/PageProcessor.cc.o -o ../server  -lmuduo_net -lmuduo_base -lpthread -ltinyxml2 
+/usr/bin/c++ CMakeFiles/server.dir/main.cc.o CMakeFiles/server.dir/KeywordProcessor.cc.o CMakeFiles/server.dir/DirectoryScanner.cc.o CMakeFiles/server.dir/PageProcessor.cc.o CMakeFiles/server.dir/serverMine.cc.o -o ../server  -lmuduo_net -lmuduo_base -lpthread -ltinyxml2 

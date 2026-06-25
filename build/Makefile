@@ -225,6 +225,30 @@ main.cc.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/server.dir/build.make CMakeFiles/server.dir/main.cc.s
 .PHONY : main.cc.s
 
+serverMine.o: serverMine.cc.o
+.PHONY : serverMine.o
+
+# target to build an object file
+serverMine.cc.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/server.dir/build.make CMakeFiles/server.dir/serverMine.cc.o
+.PHONY : serverMine.cc.o
+
+serverMine.i: serverMine.cc.i
+.PHONY : serverMine.i
+
+# target to preprocess a source file
+serverMine.cc.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/server.dir/build.make CMakeFiles/server.dir/serverMine.cc.i
+.PHONY : serverMine.cc.i
+
+serverMine.s: serverMine.cc.s
+.PHONY : serverMine.s
+
+# target to generate assembly for a file
+serverMine.cc.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/server.dir/build.make CMakeFiles/server.dir/serverMine.cc.s
+.PHONY : serverMine.cc.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -246,6 +270,9 @@ help:
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"
+	@echo "... serverMine.o"
+	@echo "... serverMine.i"
+	@echo "... serverMine.s"
 .PHONY : help
 
 

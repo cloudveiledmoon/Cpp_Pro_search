@@ -12,6 +12,7 @@ set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/home/zhr/prosearch/KeywordProcessor.cc" "CMakeFiles/server.dir/KeywordProcessor.cc.o" "gcc" "CMakeFiles/server.dir/KeywordProcessor.cc.o.d"
   "/home/zhr/prosearch/PageProcessor.cc" "CMakeFiles/server.dir/PageProcessor.cc.o" "gcc" "CMakeFiles/server.dir/PageProcessor.cc.o.d"
   "/home/zhr/prosearch/main.cc" "CMakeFiles/server.dir/main.cc.o" "gcc" "CMakeFiles/server.dir/main.cc.o.d"
+  "/home/zhr/prosearch/serverMine.cc" "CMakeFiles/server.dir/serverMine.cc.o" "gcc" "CMakeFiles/server.dir/serverMine.cc.o.d"
   )
 
 # Targets to which this target links.
