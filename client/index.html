@@ -1,26 +1,160 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>摘要查询</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>云帆搜索</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: "Microsoft YaHei", Arial, sans-serif; background: #f4f7fc; }
+        .container { max-width: 800px; margin: 40px auto; padding: 0 20px; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .header h1 { font-size: 32px; color: #1a73e8; letter-spacing: 2px; }
+        .search-box { display: flex; background: #fff; border-radius: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); overflow: hidden; }
+        .search-box input { flex: 1; border: none; padding: 14px 20px; font-size: 16px; outline: none; }
+        .search-box button { background: #1a73e8; color: #fff; border: none; padding: 14px 28px; font-size: 16px; cursor: pointer; }
+        .search-box button:hover { background: #1557b0; }
+        .keyword-recommend { margin-top: 20px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+        .keyword-recommend .title { color: #5f6368; font-size: 14px; margin-right: 8px; }
+        .keyword-item { background: #e8f0fe; color: #1a73e8; padding: 6px 16px; border-radius: 20px; font-size: 13px; cursor: pointer; transition: background 0.2s; }
+        .keyword-item:hover { background: #d2e3fc; }
+        .results { margin-top: 30px; }
+        .result-item { background: #fff; border-radius: 12px; padding: 20px; margin-bottom: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.05); }
+        .result-title { font-size: 18px; color: #1a0dab; text-decoration: none; }
+        .result-title:hover { text-decoration: underline; }
+        .result-url { font-size: 13px; color: #006621; margin: 4px 0; }
+        .result-abstract { font-size: 14px; color: #444; line-height: 1.6; margin-top: 6px; }
+        .no-results { text-align: center; color: #999; padding: 40px; }
+    </style>
 </head>
 <body>
-    <input type="text" id="query" placeholder="输入查询">
-    <button onclick="sendQuery()">发送</button>
-    <div id="result"></div>
+<div class="container">
+    <div class="header">
+        <h1>☁️ 云帆搜索</h1>
+    </div>
 
-    <script>
-        async function sendQuery() {
-            const query = document.getElementById('query').value;
-            const resp = await fetch('http://localhost:8080/query', {
+    <div class="search-box">
+        <input type="text" id="queryInput" placeholder="输入关键词，自动联想推荐..." autocomplete="off" />
+        <button onclick="doWebSearch()">搜索</button>
+    </div>
+
+    <!-- 关键词推荐区域 -->
+    <div class="keyword-recommend" id="keywordArea"></div>
+
+    <!-- 网页搜索结果区域 -->
+    <div id="resultArea" class="results"></div>
+</div>
+
+<script>
+    // 默认推荐词（后备）
+    const DEFAULT_KEYWORDS = ['经济', '文化', '科技', '教育', '健康'];
+    let debounceTimer = null;
+
+    // 页面初始化：加载默认推荐词
+    window.addEventListener('DOMContentLoaded', () => {
+        loadRecommendedKeywords('');
+    });
+
+    // 监听输入框输入事件（实时联想）
+    document.getElementById('queryInput').addEventListener('input', (e) => {
+        const query = e.target.value.trim();
+        // 清除之前的定时器，实现防抖（500ms）
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+            loadRecommendedKeywords(query);
+        }, 500);
+    });
+
+    // 监听回车键
+    document.getElementById('queryInput').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') doWebSearch();
+    });
+
+    // 网页搜索（type=2）
+    function doWebSearch() {
+        const query = document.getElementById('queryInput').value.trim();
+        if (!query) return;
+        fetchWebResults(query);
+    }
+
+    // 点击关键词搜索
+    function searchKeyword(word) {
+        document.getElementById('queryInput').value = word;
+        doWebSearch();
+    }
+
+    // 加载推荐关键词（type=1），query 为空时获取默认热门词
+    async function loadRecommendedKeywords(query) {
+        const keywordArea = document.getElementById('keywordArea');
+        // 显示加载状态
+        keywordArea.innerHTML = '<span class="title">推荐搜索：</span>';
+
+        let words = [];
+        try {
+            const resp = await fetch('/query', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ query })
+                body: JSON.stringify({ type: 1, query: query || '热门' })
             });
+            if (resp.ok) {
+                const data = await resp.json();
+                if (data.words && Array.isArray(data.words)) {
+                    words = data.words.filter(w => w && w.trim());
+                }
+            }
+        } catch (e) { /* 忽略错误，使用默认词 */ }
+
+        if (words.length === 0) words = DEFAULT_KEYWORDS;
+
+        // 构建关键词标签
+        let html = '<span class="title">推荐搜索：</span>';
+        words.forEach(word => {
+            html += `<span class="keyword-item" onclick="searchKeyword('${escapeHtml(word)}')">${escapeHtml(word)}</span>`;
+        });
+        keywordArea.innerHTML = html;
+    }
+
+    // 网页搜索请求
+    async function fetchWebResults(query) {
+        const resultArea = document.getElementById('resultArea');
+        resultArea.innerHTML = '<div class="no-results">🔍 搜索中...</div>';
+
+        try {
+            const resp = await fetch('/query', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ type: 2, query })
+            });
+            if (!resp.ok) throw new Error('网络错误');
             const data = await resp.json();
-            document.getElementById('result').innerText = 
-                '返回词：' + data.words.join(', ');
+
+            if (!Array.isArray(data) || data.length === 0) {
+                resultArea.innerHTML = '<div class="no-results">未找到相关网页</div>';
+                return;
+            }
+
+            let html = '';
+            data.forEach(item => {
+                const title = escapeHtml(item.title || '无标题');
+                const url = escapeHtml(item.link || '#');
+                const abstract = escapeHtml(item.abstract || '');
+                html += `
+                    <div class="result-item">
+                        <a class="result-title" href="${url}" target="_blank">${title}</a>
+                        <div class="result-url">${url}</div>
+                        <div class="result-abstract">${abstract}</div>
+                    </div>`;
+            });
+            resultArea.innerHTML = html;
+        } catch (e) {
+            resultArea.innerHTML = `<div class="no-results">请求失败：${e.message}</div>`;
         }
-    </script>
+    }
+
+    function escapeHtml(text) {
+        const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+        return text.replace(/[&<>"']/g, m => map[m]);
+    }
+</script>
 </body>
 </html>

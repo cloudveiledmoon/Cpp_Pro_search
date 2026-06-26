@@ -1952,23 +1952,15 @@ CMakeFiles/server.dir/serverMine.cc.o: ../serverMine.cc \
   /usr/include/c++/11/set \
   /usr/include/c++/11/bits/stl_set.h \
   /usr/include/c++/11/bits/stl_multiset.h \
-  /usr/include/c++/11/fstream \
-  /usr/include/x86_64-linux-gnu/c++/11/bits/basic_file.h \
-  /usr/include/x86_64-linux-gnu/c++/11/bits/c++io.h \
-  /usr/include/c++/11/bits/fstream.tcc \
-  /usr/local/include/utfcpp/utf8.h \
-  /usr/local/include/utfcpp/utf8/checked.h \
-  /usr/local/include/utfcpp/utf8/core.h \
-  /usr/local/include/utfcpp/utf8/cpp17.h \
-  /usr/local/include/utfcpp/utf8/cpp11.h \
-  /usr/local/include/utfcpp/utf8/checked.h \
-  /usr/local/include/utfcpp/utf8/unchecked.h \
-  ../KeywordProcessor.h \
   /usr/local/include/cppjieba/Jieba.hpp \
   /usr/local/include/cppjieba/QuerySegment.hpp \
   /usr/local/include/cppjieba/limonp/Logging.hpp \
   /usr/include/c++/11/iostream \
   /usr/local/include/cppjieba/DictTrie.hpp \
+  /usr/include/c++/11/fstream \
+  /usr/include/x86_64-linux-gnu/c++/11/bits/basic_file.h \
+  /usr/include/x86_64-linux-gnu/c++/11/bits/c++io.h \
+  /usr/include/c++/11/bits/fstream.tcc \
   /usr/include/c++/11/deque \
   /usr/include/c++/11/bits/stl_deque.h \
   /usr/include/c++/11/bits/deque.tcc \
@@ -1993,7 +1985,55 @@ CMakeFiles/server.dir/serverMine.cc.o: ../serverMine.cc \
   /usr/local/include/cppjieba/PosTagger.hpp \
   /usr/local/include/cppjieba/HMMSegment.hpp \
   /usr/local/include/cppjieba/HMMModel.hpp \
-  /usr/local/include/cppjieba/KeywordExtractor.hpp
+  /usr/local/include/cppjieba/KeywordExtractor.hpp \
+  /usr/local/include/simhash/Simhasher.hpp \
+  /usr/local/include/simhash/jenkins.h \
+  /usr/include/x86_64-linux-gnu/sys/param.h \
+  /usr/lib/gcc/x86_64-linux-gnu/11/include/limits.h \
+  /usr/lib/gcc/x86_64-linux-gnu/11/include/syslimits.h \
+  /usr/include/limits.h \
+  /usr/include/x86_64-linux-gnu/bits/posix1_lim.h \
+  /usr/include/x86_64-linux-gnu/bits/local_lim.h \
+  /usr/include/linux/limits.h \
+  /usr/include/x86_64-linux-gnu/bits/posix2_lim.h \
+  /usr/include/x86_64-linux-gnu/bits/xopen_lim.h \
+  /usr/include/x86_64-linux-gnu/bits/uio_lim.h \
+  /usr/include/signal.h \
+  /usr/include/x86_64-linux-gnu/bits/signum-generic.h \
+  /usr/include/x86_64-linux-gnu/bits/signum-arch.h \
+  /usr/include/x86_64-linux-gnu/bits/types/sig_atomic_t.h \
+  /usr/include/x86_64-linux-gnu/bits/types/siginfo_t.h \
+  /usr/include/x86_64-linux-gnu/bits/types/__sigval_t.h \
+  /usr/include/x86_64-linux-gnu/bits/siginfo-arch.h \
+  /usr/include/x86_64-linux-gnu/bits/siginfo-consts.h \
+  /usr/include/x86_64-linux-gnu/bits/siginfo-consts-arch.h \
+  /usr/include/x86_64-linux-gnu/bits/types/sigval_t.h \
+  /usr/include/x86_64-linux-gnu/bits/types/sigevent_t.h \
+  /usr/include/x86_64-linux-gnu/bits/sigevent-consts.h \
+  /usr/include/x86_64-linux-gnu/bits/sigaction.h \
+  /usr/include/x86_64-linux-gnu/bits/sigcontext.h \
+  /usr/include/x86_64-linux-gnu/bits/types/stack_t.h \
+  /usr/include/x86_64-linux-gnu/sys/ucontext.h \
+  /usr/include/x86_64-linux-gnu/bits/sigstack.h \
+  /usr/include/x86_64-linux-gnu/bits/sigstksz.h \
+  /usr/include/x86_64-linux-gnu/bits/ss_flags.h \
+  /usr/include/x86_64-linux-gnu/bits/types/struct_sigstack.h \
+  /usr/include/x86_64-linux-gnu/bits/sigthread.h \
+  /usr/include/x86_64-linux-gnu/bits/signal_ext.h \
+  /usr/include/x86_64-linux-gnu/bits/param.h \
+  /usr/include/linux/param.h \
+  /usr/include/x86_64-linux-gnu/asm/param.h \
+  /usr/include/asm-generic/param.h \
+  /usr/local/include/utfcpp/utf8.h \
+  /usr/local/include/utfcpp/utf8/checked.h \
+  /usr/local/include/utfcpp/utf8/core.h \
+  /usr/local/include/utfcpp/utf8/cpp17.h \
+  /usr/local/include/utfcpp/utf8/cpp11.h \
+  /usr/local/include/utfcpp/utf8/checked.h \
+  /usr/local/include/utfcpp/utf8/unchecked.h \
+  ../KeywordProcessor.h \
+  /usr/local/include/tinyxml2.h \
+  /usr/include/c++/11/climits
 
 
 ../serverMine.cc:

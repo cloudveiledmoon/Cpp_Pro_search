@@ -33,6 +33,37 @@ void PageProcessor::process(const std::string &dir){
     build_inevrted_index("./data/index/web.index");
 }
 
+std::string sanitizeUtf8(const std::string& s) {
+    std::string result;
+    for (size_t i = 0; i < s.size(); ) {
+        unsigned char c = s[i];
+        // 1-byte ASCII (0x00–0x7F)
+        if (c <= 0x7F) {
+            result += c; ++i;
+        }
+        // 2-byte sequence (C2-DF, followed by 80-BF)
+        else if (c >= 0xC2 && c <= 0xDF && i + 1 < s.size() &&
+                 (s[i+1] & 0xC0) == 0x80) {
+            result += s.substr(i, 2); i += 2;
+        }
+        // 3-byte sequence (E0-EF, followed by two 80-BF)
+        else if (c >= 0xE0 && c <= 0xEF && i + 2 < s.size() &&
+                 (s[i+1] & 0xC0) == 0x80 && (s[i+2] & 0xC0) == 0x80) {
+            result += s.substr(i, 3); i += 3;
+        }
+        // 4-byte sequence (F0-F4, followed by three 80-BF)
+        else if (c >= 0xF0 && c <= 0xF4 && i + 3 < s.size() &&
+                 (s[i+1] & 0xC0) == 0x80 && (s[i+2] & 0xC0) == 0x80 &&
+                 (s[i+3] & 0xC0) == 0x80) {
+            result += s.substr(i, 4); i += 4;
+        }
+        // illegal byte, skip it
+        else {
+            ++i;   // or you can append '?' to keep length
+        }
+    }
+    return result;
+}
 bool PageProcessor::is_chinese_token(const std::string& token) {
     for (size_t i = 0; i < token.size(); ) {
         unsigned char c = token[i];
@@ -62,9 +93,9 @@ bool PageProcessor::is_chinese_token(const std::string& token) {
 
 void PageProcessor::build_pages_and_offsets(const std::string &pagename,const std::string &offsets){
     
-    off_t offset=0;
-    ofstream page_on(pagename);
-    ofstream offset_on(offsets);
+    uint64_t offset = 0;
+    std::ofstream page_on(pagename, std::ios::binary);
+    std::ofstream offset_on(offsets, std::ios::binary);
     
     for(auto &doc:documents_){
         XMLDocument page;
@@ -215,7 +246,10 @@ void PageProcessor::xml_to_documents(const std::string &filename,int &id){
                 continue;
             }
         }
-        documents_.push_back({++id,title->GetText(),link->GetText(),content->GetText()});
+        std::string s_title   = title   ? sanitizeUtf8(title->GetText() ? title->GetText() : "") : "";
+        std::string s_link    = link    ? sanitizeUtf8(link->GetText()  ? link->GetText()  : "") : "";
+        std::string s_content = content ? sanitizeUtf8(content->GetText() ? content->GetText() : "") : "";
+        documents_.push_back({++id,std::move(s_title),std::move(s_link),std::move(s_content)});
     }
 }
 void PageProcessor::extract_documents(const std::string &dir){

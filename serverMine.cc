@@ -4,15 +4,18 @@
 #include <map>
 #include <set>
 #include <vector>
+#include <utility>
 #include <algorithm>
 #include <utfcpp/utf8.h>
 #include <muduo/base/Logging.h>
 #include "KeywordProcessor.h"
+#include <tinyxml2.h>
 
 using namespace muduo;
 using namespace muduo::net;
 using json = nlohmann::json;
 using namespace std;
+
 
 int ServerMine::minDistance(const string &word1, const string &word2)
 {
@@ -108,86 +111,273 @@ json ServerMine::makeSummary(const std::string &query)
 }
 
 
-json ServerMine::makeWebpage(const std::string &query){
+json ServerMine::makeWebpage(const std::string &query)
+{
+    
     vector<string> query_word;
-    tokenizer_.Cut(query,query_word);
-    map<string,int> query_map;
-    for(auto word:query_word){
-        if(KeywordProcessor::is_chinese_token(word)&&stopwords_.find(word) == stopwords_.end()){
+    tokenizer_.Cut(query, query_word);
+    map<string, int> query_map;
+    string frist_keyword=query_word[0];
+    for (auto word : query_word)
+    {
+        if (KeywordProcessor::is_chinese_token(word) && stopwords_.find(word) == stopwords_.end())
+        {
             query_map[word]++;
         }
     }
-    map<string,double> tf_doc;
-    for(auto word:query_map){
-        tf_doc[word.first] = (static_cast<double>(word.second)/query_map.size()+0.0);
+   
+
+
+    map<string, double> tf_doc;
+    for (auto word : query_map)
+    {
+        tf_doc[word.first] = (static_cast<double>(word.second) / query_map.size() + 0.0);
     }
-    map<string,double> idf_tf_doc;
-    for(auto word:query_map){
-        double N = static_cast<double>(invertedIndex_.size()+1.0);
-        double df = static_cast<double>(invertedIndex_[word.first].size()+1.0);
-        idf_tf_doc[word.first] = log2(N/(df+1.0))*tf_doc[word.first];
-    }
-
-    vector<int> 
-
- 
-
 
     
 
+    map<string, double> idf_tf_doc; // idf
+    for (auto word : query_map)
+    {
+        double N = static_cast<double>(invertedIndex_.size() + 1.0);
+        double df = static_cast<double>(invertedIndex_[word.first].size() + 1.0);
+        idf_tf_doc[word.first] = log2(N / (df + 1.0)) * tf_doc[word.first];
+    }
+    
 
+    std::vector<int> result = searchAllKeywords(query_map, idf_tf_doc);
+    json web_array = json::array();
+    if (result.empty())
+    {
+        return web_array;
+    }
+    
+
+    // string frist_keyword = std::max_element(query_map.begin(), query_map.end(),
+    //                                         [](const auto &a, const auto &b)
+    //                                         {
+    //                                             return a.second < b.second;
+    //                                         })
+    //                            ->first;
+
+    ifstream ifs("./data/dict/web.xml");
+    if(!ifs.is_open()){
+         return web_array;
+    }
+
+    int id_count = 12;
+    for (auto &id : result)
+    {
+        if(id_count--==0){break;}
+        auto offset = doc_[id].first;
+        auto size = doc_[id].second;
+
+        ifs.seekg(offset, std::ios::beg);
+        string xmlbuf= string(size, ' ');
+        ifs.read(&xmlbuf[0], size);
+
+        // 检查读取到的片段是否以 <doc 开头，若不是则尝试前后微调（不推荐长期方案）
+if (xmlbuf.find("<doc") != 0) {
+    // 可能偏移错误，跳过或报错
+    cerr << "Skipping doc " << id << " due to invalid fragment start" << endl;
+    continue;
+}
+// 确保末尾是 </doc>
+if (xmlbuf.rfind("</doc>") == string::npos) {
+    cerr << "Fragment for doc " << id << " does not end with </doc>" << endl;
+    continue;
+}
+        json doc = parseDocFragment(xmlbuf, frist_keyword);
+        web_array.push_back(doc);
+
+    }
+    return web_array;
+}
+json ServerMine::parseDocFragment(const std::string &xmlContent, const std::string &first_keyword)
+{
+    tinyxml2::XMLDocument doc;
+    tinyxml2::XMLError err = doc.Parse(xmlContent.c_str());
+    if (err != tinyxml2::XML_SUCCESS)
+    {
+        throw std::runtime_error("Failed to parse XML fragment");
+    }
+
+    tinyxml2::XMLElement *docElem = doc.FirstChildElement("doc");
+    if (!docElem)
+    {
+        throw std::runtime_error("No <doc> element found");
+    }
+
+    json result = json::object();
+    if (auto *elem = docElem->FirstChildElement("id"))
+        result["id"] = elem->GetText() ? elem->GetText() : "";
+    if (auto *elem = docElem->FirstChildElement("title"))
+        result["title"] = elem->GetText() ? elem->GetText() : "";
+    if (auto *elem = docElem->FirstChildElement("link"))
+        result["link"] = elem->GetText() ? elem->GetText() : "";
+    if (auto *elem = docElem->FirstChildElement("content"))
+    {
+        string abstract = elem->GetText() ? elem->GetText() : "";
+        result["abstract"] = getAbstract(abstract, first_keyword);
+    }
+
+    return result;
 }
 
-std::vector<int> ServerMine::searchAllKeywords(const std::map<std::string, int>& query_map){
-    vector<int> result;
+string ServerMine::getAbstract(const string &abstract, const string &first_keyword)
+{
+    if (abstract.empty()){return "";}
+        
+    size_t pos = abstract.find(first_keyword);
+    if (pos == std::string::npos) {
+        // 关键词不存在，返回全文的前若干字符或空串，根据业务决定
+        const char *safe_begin=abstract.data();
+        const char *safe_end=abstract.data()+abstract.size();
+        const char *safe_pos=safe_begin;
+        for(int i=0;i<50;i++){
+            utf8::next(safe_pos,safe_end);
+        }
+        return std::string(safe_begin,safe_pos-safe_begin)+"...";
+    }
+    const char *safe_begin=abstract.data();
+    const char *safe_end=abstract.data()+abstract.size();
+    const char *safe_pos=safe_begin;
+
+    size_t char_count = 0;
+    while(safe_pos<safe_begin+pos){
+        utf8::next(safe_pos,safe_end);
+        char_count++;
+    }
+
+    const size_t preChars = 15;
+    const size_t postChars = 35;
+    size_t startChar=(char_count>=preChars)?(char_count-preChars):0;
+    size_t endChar=utf8::distance(first_keyword.c_str(),first_keyword.c_str()+first_keyword.size());
+    size_t totalChars=preChars+endChar+postChars;
+
+    const char *startPtr=safe_begin;
+    for(size_t i=0;i<startChar;i++){
+        utf8::next(startPtr,safe_end);
+    }
+    const char *endPtr=startPtr;
+    for(size_t i=0;i<totalChars&&endPtr<safe_end;i++){
+        utf8::next(endPtr,safe_end);
+    }
+    std::string snippet = std::string(startPtr, endPtr-startPtr);
+    if(endPtr<safe_end){
+        snippet += "...";
+    }
+    return snippet;
+}
+std::vector<int> ServerMine::searchAllKeywords(const std::map<std::string, int> &query_map, const std::map<std::string, double> &idf_tf_doc)
+{
+    map<int, map<string, double>> result;
     bool flag = true;
-    for(auto &word:query_map){
-        if(invertedIndex_.find(word.first) == invertedIndex_.end()){
-                return {};
-            }
-        if(flag){
-            for(auto doc:invertedIndex_[word.first]){
-                result.push_back(doc.first);
+    for (auto &word : query_map)
+    {
+        if (invertedIndex_.find(word.first) == invertedIndex_.end())
+        {
+            return {};
+        }
+        if (flag)
+        {
+            for (auto doc : invertedIndex_[word.first])
+            {
+                result[doc.first][word.first] = doc.second;
             }
             flag = false;
             continue;
         }
-        for(auto &id:result){
-            if(invertedIndex_[word.first].find(id) == invertedIndex_[word.first].end()){
-                result.erase(std::remove(result.begin(),result.end(),id),result.end());
+
+        for (auto it = result.begin(); it != result.end();)
+        {
+            int docId = it->first;     // 文档 ID
+            auto &docVec = it->second; // 该文档的词权重 map
+
+            // 检查该文档是否包含当前词
+            auto pos = invertedIndex_[word.first].find(docId);
+            if (pos == invertedIndex_[word.first].end())
+            {
+                // 不包含，删除该文档
+                it = result.erase(it); // erase 返回下一个有效迭代器
+            }
+            else
+            {
+                // 包含，记录该词在该文档中的权重
+                docVec[word.first] = pos->second; // 或直接使用 invertedIndex_[word.first][docId]
+                ++it;
             }
         }
-        if(result.empty()){
+
+        if (result.empty())
+        {
             return {};
         }
     }
-    return result;
+    double moduleX = 0;
+    for (auto &needX : idf_tf_doc)
+    {
+        moduleX += needX.second * needX.second;
+    }
+    moduleX = sqrt(moduleX); // X模长
+
+    map<int, double> cosine;
+    for (auto &id : result)
+    {
+        double mod = 0;
+        for (auto &needY : id.second)
+        {
+            mod += needY.second * needY.second;
+        }
+        mod = sqrt(mod);
+        double XY = 0;
+        for (auto &xx : idf_tf_doc)
+        {
+            XY += xx.second * id.second[xx.first];
+        }
+        cosine[id.first] = XY / (moduleX * mod);
+    }
+
+    std::vector<std::pair<int, double>> items(cosine.begin(), cosine.end());
+
+    // 按余弦值降序排序
+    std::sort(items.begin(), items.end(),
+              [](const auto &a, const auto &b)
+              { return a.second > b.second; });
+    std::vector<int> webResult;
+    webResult.reserve(items.size());
+    for (const auto &[docId, sim] : items)
+    {
+        webResult.push_back(docId);
+    }
+    return webResult;
 }
+
 // ---------- 处理请求 ----------
-void ServerMine::onRequest(const TcpConnectionPtr &conn,
+void ServerMine::onRequest(const muduo::net::TcpConnectionPtr &conn,
                            const Message &msg,
-                           Timestamp)
+                           muduo::Timestamp receiveTime)
 {
     json summary;
     if (msg.type == 1)
     { // 查询请求
-         summary = makeSummary(msg.value);
-        
-    }else if(msg.type == 2){
+        summary = makeSummary(msg.value);
+    }
+    else if (msg.type == 2)
+    {
         summary = makeWebpage(msg.value);
     }
     std::string respBody = summary.dump();
 
-        Message respMsg;
-        respMsg.type = 2;
-        respMsg.length = respBody.size();
-        respMsg.value = respBody;
-        MessageCodec::send(conn, respMsg);
+    Message respMsg;
+    respMsg.type = 1;
+    respMsg.length = respBody.size();
+    respMsg.value = respBody;
+ 
+    MessageCodec::send(conn, respMsg);
 }
 
-ServerMine::ServerMine(EventLoop *loop,
-                       const InetAddress &listenAddr,
-                       const std::string &name)
+ServerMine::ServerMine(EventLoop *loop, const InetAddress &listenAddr, const std::string &name)
     : server_(loop, listenAddr, name),
       codec_(std::bind(&ServerMine::onRequest, this, _1, _2, _3))
 {
@@ -234,21 +424,22 @@ ServerMine::ServerMine(EventLoop *loop,
             index_[word].insert(doc_id);
         }
     }
-    
-
     dict_in.close();
     index_in.close();
 }
-void ServerMine::build_stopword(){
+void ServerMine::build_stopword()
+{
     ifstream cn_in("./stopwords/cn_stopwords.txt");
     ifstream en_in("./stopwords/en_stopwords.txt");
 
-    while(cn_in){
+    while (cn_in)
+    {
         std::string word;
         cn_in >> word;
         stopwords_.insert(word);
     }
-    while(en_in){
+    while (en_in)
+    {
         std::string word;
         en_in >> word;
         stopwords_.insert(word);
@@ -257,38 +448,38 @@ void ServerMine::build_stopword(){
     cn_in.close();
 }
 
-void ServerMine::build_inverse_index(){
+void ServerMine::build_inverse_index()
+{
     std::ifstream index_in("./data/index/web.index");
     std::ifstream doc_in("./data/dict/web.offset");
     std::string line;
-    while(doc_in){
-        int id;
-        int offset;
-        int size;
-        doc_in >> id >> offset >> size;
-        doc_[id]={offset,size};
+    int id;
+    uint64_t offset;                // 必须 64 位
+    size_t size;                    // size_t 通常 64 位
+    while (doc_in >> id >> offset >> size) {
+        doc_[id] = {static_cast<std::streamoff>(offset), size};
     }
-    
-    std::string line;
-    while (std::getline(index_in, line)) {
-        if (line.empty()) continue;
+
+    while (std::getline(index_in, line))
+    {
+        if (line.empty())
+            continue;
         std::istringstream iss(line);
         std::string word;
         iss >> word; // 第一个词
         int docId;
         double weight;
         std::map<int, double> docWeights;
-        while (iss >> docId >> weight) {
+        while (iss >> docId >> weight)
+        {
             docWeights[docId] = weight;
         }
         invertedIndex_[word] = std::move(docWeights);
     }
 
-
     index_in.close();
     doc_in.close();
 }
-
 
 void ServerMine::start()
 {

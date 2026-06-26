@@ -55,14 +55,46 @@ private:
     }
 
     void onResponse(const TcpConnectionPtr&, const Message& msg) {
-        if (msg.type == 2) {
-            json j = json::parse(msg.value);
-            auto words = j["words"];
-            std::cout << "Received words: ";
-            for (auto& w : words) std::cout << w.get<std::string>() << " ";
-            std::cout << std::endl;
-            std::cout<<"Enter query: "<<std::flush;
+         try {
+        json j = json::parse(msg.value);
+        if (msg.type == 1) {
+            // 处理网页搜索结果（JSON 数组）
+            if (!j.is_array()) {
+                std::cerr << "Invalid response format for type 1" << std::endl;
+            } else {
+                std::cout << "Search results:" << std::endl;
+                int count = 1;
+                for (const auto& item : j) {
+                    // 提取需要的字段（根据实际返回的 JSON 结构调整）
+                    std::string id = item.value("id", "?");
+                    std::string title = item.value("title", "No title");
+                    std::string abstract = item.value("abstract", "");
+                    
+                    std::cout << count++ << ". [" << id << "] " << title << std::endl;
+                    if (!abstract.empty()) {
+                        std::cout << "   " << abstract << std::endl;
+                    }
+                }
+            }
+        } else if (msg.type == 2) {
+            // 处理关键词推荐（原逻辑）
+            if (j.contains("words") && j["words"].is_array()) {
+                auto words = j["words"];
+                std::cout << "Recommended words: ";
+                for (const auto& w : words) {
+                    std::cout << w.get<std::string>() << " ";
+                }
+                std::cout << std::endl;
+            }
+        } else {
+            std::cout << "Unknown message type: " << (int)msg.type << std::endl;
         }
+    } catch (const json::parse_error& e) {
+        std::cerr << "JSON parse error: " << e.what() << std::endl;
+    } catch (const std::exception& e) {
+        std::cerr << "Error processing message: " << e.what() << std::endl;
+    }
+
     }
     void inputLoop() {
         std::string query;
@@ -74,7 +106,7 @@ private:
             loop_->queueInLoop([this, query] {
                 if (connection_) {
                     Message req;
-                    req.type = 1;
+                    req.type = 2;
                     req.length = query.size();
                     req.value = query;
                     MessageCodec::send(connection_, req);

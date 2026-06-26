@@ -6,8 +6,11 @@
 #include "MessageCodec.h"
 #include<set>
 #include<map>
+#include<string>
 #include<cppjieba/Jieba.hpp>
 #include<simhash/Simhasher.hpp>
+#include <sys/types.h>
+using json = nlohmann::json;
 class ServerMine {
 public:
     // 构造函数：传入事件循环、监听地址和服务器名称
@@ -19,8 +22,9 @@ public:
     void start();
     void build_stopword();
     void build_inverse_index();
-    std::vector<int> searchAllKeywords(const std::map<std::string, int>& query_map);
-
+    std::vector<int> searchAllKeywords(const std::map<std::string, int>& query_map,const std::map<std::string,double>& idf_tf_doc);
+    json parseDocFragment(const std::string& xmlContent,const std::string & first_keyword);
+    std::string getAbstract(const std::string &abstract,const std::string &first_keyword);
 private:
     int minDistance(const std::string& word1, const std::string& word2);
     // 处理客户端请求的回调
@@ -45,7 +49,7 @@ private:
     };
     cppjieba::Jieba tokenizer_;
     simhash::Simhasher hasher_;
-    std::map<int,pair<int,off_t>> doc_;
+    std::map<int,std::pair<int,off_t>> doc_;
     std::set<std::string> stopwords_;
     std::map<std::string,std::map<int,double>> invertedIndex_;
 
