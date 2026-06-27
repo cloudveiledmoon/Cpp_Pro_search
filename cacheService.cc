@@ -7,10 +7,14 @@ using json = nlohmann::json;
 HashCaches::HashCaches(int word_capacity, int web_capacity)
     : word_capacity(word_capacity), web_capacity(web_capacity)
 {
+    word_mutexes_ = std::vector<std::mutex>(8);
+    web_mutexes_ = std::vector<std::mutex>(8);
 }
 std::vector<std::string> HashCaches::get_word(const std::string &key)
 {
     int pos = hash(key);
+    
+    std::lock_guard<std::mutex> lock(word_mutexes_[pos]); // 锁住对应桶
     if (word_capacity == 0 || word_caches_[pos].size() == 0)
     {
         return {};
@@ -29,6 +33,7 @@ std::vector<std::string> HashCaches::get_word(const std::string &key)
 void HashCaches::put_word(const std::string &key, const std::vector<std::string> &value)
 {
     int pos = hash(key);
+     std::lock_guard<std::mutex> lock(word_mutexes_[pos]); // 锁住对应桶
     if (word_capacity == word_caches_[pos].size())
     {
         auto elemt = word_caches_[pos].begin();
@@ -59,6 +64,7 @@ void HashCaches::put_word(const std::string &key, const std::vector<std::string>
 json HashCaches::get_web(const int &id, const std::string &first_keyword)
 {
     int pos=hash(id);
+     std::lock_guard<std::mutex> lock(web_mutexes_[pos]); // 锁住对应桶
     json ret = json::object();
     if (web_capacity == 0 || web_caches_[pos].size() == 0)
     {
@@ -84,6 +90,7 @@ json HashCaches::get_web(const int &id, const std::string &first_keyword)
 void HashCaches::put_web(const int &key, const Documents &value)
 {
     int pos=hash(key);
+     std::lock_guard<std::mutex> lock(web_mutexes_[pos]); // 锁住对应桶
     if (web_capacity == web_caches_[pos].size())
     {
         auto target = web_caches_[pos].begin();

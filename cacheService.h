@@ -4,6 +4,7 @@
 #include <map>
 #include <vector>
 #include<nlohmann/json.hpp>
+#include<mutex>
 
 struct Documents
     {
@@ -16,7 +17,9 @@ class HashCaches
 {
 public:
    HashCaches(){
-      word_capacity = 30;web_capacity = 30;
+    word_capacity = 30;web_capacity = 30;
+    word_mutexes_ = std::vector<std::mutex>(8);
+    web_mutexes_ = std::vector<std::mutex>(8);
    }
     HashCaches(int word_capacity,int web_capacity);
     std::vector<std::string> get_word(const std::string &key);
@@ -59,5 +62,9 @@ private:
     std::map<int,std::vector<Web>> web_caches_;
     template<typename T>
     int hash(T& key);
+
+    // 桶级互斥锁
+    mutable std::vector<std::mutex> word_mutexes_;
+    mutable std::vector<std::mutex> web_mutexes_;
 
 };
