@@ -441,4 +441,5 @@ CMakeFiles/server.dir/main.cc.o: /home/zhr/prosearch/main.cc \
  /usr/local/include/nlohmann/thirdparty/hedley/hedley_undef.hpp \
  /home/zhr/prosearch/MessageCodec.h \
  /usr/local/include/muduo/base/Logging.h \
- /usr/local/include/muduo/base/LogStream.h
+ /usr/local/include/muduo/base/LogStream.h \
+ /home/zhr/prosearch/cacheService.h

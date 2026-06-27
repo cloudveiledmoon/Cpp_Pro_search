@@ -26,7 +26,7 @@ void testrun2(){
 int main(int argc, char * argv[]){
     //testrun();
     //testrun2();
-
+    muduo::Logger::setLogLevel(muduo::Logger::ERROR);
     muduo::net::EventLoop loop;
     muduo::net::InetAddress listenAddr(2947);
     ServerMine server(&loop, listenAddr, "ServerMine");

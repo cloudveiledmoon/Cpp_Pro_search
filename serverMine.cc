@@ -16,7 +16,6 @@ using namespace muduo::net;
 using json = nlohmann::json;
 using namespace std;
 
-
 int ServerMine::minDistance(const string &word1, const string &word2)
 {
     int n = word1.length();
@@ -58,6 +57,18 @@ int ServerMine::minDistance(const string &word1, const string &word2)
 //  生成关键词推荐
 json ServerMine::makeSummary(const std::string &query)
 {
+    // 本地缓存获取
+    std::vector<string> cache = cacheService_.get_word(query);
+    if (!cache.empty())
+    {
+        json cache_json = json::array();
+        for (auto &str : cache)
+        {
+            cache_json.push_back(str);
+        }
+        cerr << "cache hit" << std::endl;
+        return cache_json;
+    }
 
     // 解析查询中的中文字符，统计相关词频
     std::map<std::string, int> word_count;
@@ -95,6 +106,13 @@ json ServerMine::makeSummary(const std::string &query)
                     return a.second > b.second;
                 }
                 return a_dist < b_dist; });
+    // 本地缓存存储
+    std::vector<std::string> return_sorted;
+    for (auto &item : sorted)
+    {
+        return_sorted.push_back(item.first);
+    }
+    cacheService_.put_word(query, return_sorted);
 
     json words_array = json::array();
     for (int i = 0; i < std::min(5, (int)sorted.size()); ++i)
@@ -110,14 +128,13 @@ json ServerMine::makeSummary(const std::string &query)
     return json{{"words", words_array}};
 }
 
-
 json ServerMine::makeWebpage(const std::string &query)
 {
-    
+
     vector<string> query_word;
     tokenizer_.Cut(query, query_word);
     map<string, int> query_map;
-    string frist_keyword=query_word[0];
+    string frist_keyword = query_word[0];
     for (auto word : query_word)
     {
         if (KeywordProcessor::is_chinese_token(word) && stopwords_.find(word) == stopwords_.end())
@@ -125,16 +142,11 @@ json ServerMine::makeWebpage(const std::string &query)
             query_map[word]++;
         }
     }
-   
-
-
     map<string, double> tf_doc;
     for (auto word : query_map)
     {
         tf_doc[word.first] = (static_cast<double>(word.second) / query_map.size() + 0.0);
     }
-
-    
 
     map<string, double> idf_tf_doc; // idf
     for (auto word : query_map)
@@ -143,7 +155,6 @@ json ServerMine::makeWebpage(const std::string &query)
         double df = static_cast<double>(invertedIndex_[word.first].size() + 1.0);
         idf_tf_doc[word.first] = log2(N / (df + 1.0)) * tf_doc[word.first];
     }
-    
 
     std::vector<int> result = searchAllKeywords(query_map, idf_tf_doc);
     json web_array = json::array();
@@ -151,7 +162,6 @@ json ServerMine::makeWebpage(const std::string &query)
     {
         return web_array;
     }
-    
 
     // string frist_keyword = std::max_element(query_map.begin(), query_map.end(),
     //                                         [](const auto &a, const auto &b)
@@ -161,35 +171,54 @@ json ServerMine::makeWebpage(const std::string &query)
     //                            ->first;
 
     ifstream ifs("./data/dict/web.xml");
-    if(!ifs.is_open()){
-         return web_array;
+    if (!ifs.is_open())
+    {
+        return web_array;
     }
 
     int id_count = 12;
     for (auto &id : result)
     {
-        if(id_count--==0){break;}
+        if (id_count-- == 0)
+        {
+            break;
+        }
+
+        // 本地缓存获取
+        json cache = cacheService_.get_web(id, frist_keyword);
+        if (!cache.empty())
+        {
+            web_array.push_back(cache);
+            continue;
+        }
+
         auto offset = doc_[id].first;
         auto size = doc_[id].second;
 
         ifs.seekg(offset, std::ios::beg);
-        string xmlbuf= string(size, ' ');
+        string xmlbuf = string(size, ' ');
         ifs.read(&xmlbuf[0], size);
 
         // 检查读取到的片段是否以 <doc 开头，若不是则尝试前后微调（不推荐长期方案）
-if (xmlbuf.find("<doc") != 0) {
-    // 可能偏移错误，跳过或报错
-    cerr << "Skipping doc " << id << " due to invalid fragment start" << endl;
-    continue;
-}
-// 确保末尾是 </doc>
-if (xmlbuf.rfind("</doc>") == string::npos) {
-    cerr << "Fragment for doc " << id << " does not end with </doc>" << endl;
-    continue;
-}
+        if (xmlbuf.find("<doc") != 0)
+        {
+            // 可能偏移错误，跳过或报错
+            cerr << "Skipping doc " << id << " due to invalid fragment start" << endl;
+            continue;
+        }
+        // 确保末尾是 </doc>
+        if (xmlbuf.rfind("</doc>") == string::npos)
+        {
+            cerr << "Fragment for doc " << id << " does not end with </doc>" << endl;
+            continue;
+        }
         json doc = parseDocFragment(xmlbuf, frist_keyword);
         web_array.push_back(doc);
-
+        std::string title = doc.value("title", "");
+        std::string link = doc.value("link", "");
+        std::string content = doc.value("content", "");
+        Documents value = {id, title, link, content};
+        cacheService_.put_web(id, value);
     }
     return web_array;
 }
@@ -226,45 +255,54 @@ json ServerMine::parseDocFragment(const std::string &xmlContent, const std::stri
 
 string ServerMine::getAbstract(const string &abstract, const string &first_keyword)
 {
-    if (abstract.empty()){return "";}
-        
-    size_t pos = abstract.find(first_keyword);
-    if (pos == std::string::npos) {
-        // 关键词不存在，返回全文的前若干字符或空串，根据业务决定
-        const char *safe_begin=abstract.data();
-        const char *safe_end=abstract.data()+abstract.size();
-        const char *safe_pos=safe_begin;
-        for(int i=0;i<50;i++){
-            utf8::next(safe_pos,safe_end);
-        }
-        return std::string(safe_begin,safe_pos-safe_begin)+"...";
+    if (abstract.empty())
+    {
+        return "";
     }
-    const char *safe_begin=abstract.data();
-    const char *safe_end=abstract.data()+abstract.size();
-    const char *safe_pos=safe_begin;
+
+    size_t pos = abstract.find(first_keyword);
+    if (pos == std::string::npos)
+    {
+        // 关键词不存在，返回全文的前若干字符或空串，根据业务决定
+        const char *safe_begin = abstract.data();
+        const char *safe_end = abstract.data() + abstract.size();
+        const char *safe_pos = safe_begin;
+        for (int i = 0; i < 50; i++)
+        {
+            utf8::next(safe_pos, safe_end);
+        }
+        return std::string(safe_begin, safe_pos - safe_begin) + "...";
+    }
+    const char *safe_begin = abstract.data();
+    const char *safe_end = abstract.data() + abstract.size();
+    const char *safe_pos = safe_begin;
 
     size_t char_count = 0;
-    while(safe_pos<safe_begin+pos){
-        utf8::next(safe_pos,safe_end);
+    while (safe_pos < safe_begin + pos)
+    {
+        utf8::next(safe_pos, safe_end);
         char_count++;
     }
 
     const size_t preChars = 15;
     const size_t postChars = 35;
-    size_t startChar=(char_count>=preChars)?(char_count-preChars):0;
-    size_t endChar=utf8::distance(first_keyword.c_str(),first_keyword.c_str()+first_keyword.size());
-    size_t totalChars=preChars+endChar+postChars;
+    size_t startChar = (char_count >= preChars) ? (char_count - preChars) : 0;
+    size_t endChar = utf8::distance(first_keyword.c_str(), first_keyword.c_str() + first_keyword.size());
+    size_t totalChars = preChars + endChar + postChars;
 
-    const char *startPtr=safe_begin;
-    for(size_t i=0;i<startChar;i++){
-        utf8::next(startPtr,safe_end);
+    const char *startPtr = safe_begin;
+    for (size_t i = 0; i < startChar; i++)
+    {
+        utf8::next(startPtr, safe_end);
     }
-    const char *endPtr=startPtr;
-    for(size_t i=0;i<totalChars&&endPtr<safe_end;i++){
-        utf8::next(endPtr,safe_end);
+    const char *endPtr = startPtr;
+    for (size_t i = 0; i < totalChars && endPtr < safe_end; i++)
+    {
+        utf8::next(endPtr, safe_end);
     }
-    std::string snippet = std::string(startPtr, endPtr-startPtr);
-    if(endPtr<safe_end){
+    std::string snippet = std::string(startPtr, endPtr - startPtr);
+    if (endPtr < safe_end)
+    {
         snippet += "...";
     }
     return snippet;
@@ -373,7 +411,7 @@ void ServerMine::onRequest(const muduo::net::TcpConnectionPtr &conn,
     respMsg.type = 1;
     respMsg.length = respBody.size();
     respMsg.value = respBody;
- 
+
     MessageCodec::send(conn, respMsg);
 }
 
@@ -390,6 +428,7 @@ ServerMine::ServerMine(EventLoop *loop, const InetAddress &listenAddr, const std
             codec_.onMessage(conn, buf, t);
         });
     server_.setThreadNum(4);
+
     std::ifstream dict_in("./data/dict/cn.dict");
     std::ifstream index_in("./data/index/cn.index");
     std::string line;
@@ -454,9 +493,10 @@ void ServerMine::build_inverse_index()
     std::ifstream doc_in("./data/dict/web.offset");
     std::string line;
     int id;
-    uint64_t offset;                // 必须 64 位
-    size_t size;                    // size_t 通常 64 位
-    while (doc_in >> id >> offset >> size) {
+    uint64_t offset; // 必须 64 位
+    size_t size;     // size_t 通常 64 位
+    while (doc_in >> id >> offset >> size)
+    {
         doc_[id] = {static_cast<std::streamoff>(offset), size};
     }
 

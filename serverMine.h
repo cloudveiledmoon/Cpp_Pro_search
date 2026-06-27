@@ -9,6 +9,7 @@
 #include<string>
 #include<cppjieba/Jieba.hpp>
 #include<simhash/Simhasher.hpp>
+#include "cacheService.h"
 #include <sys/types.h>
 using json = nlohmann::json;
 class ServerMine {
@@ -24,7 +25,7 @@ public:
     void build_inverse_index();
     std::vector<int> searchAllKeywords(const std::map<std::string, int>& query_map,const std::map<std::string,double>& idf_tf_doc);
     json parseDocFragment(const std::string& xmlContent,const std::string & first_keyword);
-    std::string getAbstract(const std::string &abstract,const std::string &first_keyword);
+    static std::string getAbstract(const std::string &abstract,const std::string &first_keyword);
 private:
     int minDistance(const std::string& word1, const std::string& word2);
     // 处理客户端请求的回调
@@ -49,6 +50,7 @@ private:
     };
     cppjieba::Jieba tokenizer_;
     simhash::Simhasher hasher_;
+    HashCaches cacheService_;
     std::map<int,std::pair<int,off_t>> doc_;
     std::set<std::string> stopwords_;
     std::map<std::string,std::map<int,double>> invertedIndex_;

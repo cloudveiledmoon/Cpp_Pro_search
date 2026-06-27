@@ -201,6 +201,30 @@ PageProcessor.cc.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/server.dir/build.make CMakeFiles/server.dir/PageProcessor.cc.s
 .PHONY : PageProcessor.cc.s
 
+cacheService.o: cacheService.cc.o
+.PHONY : cacheService.o
+
+# target to build an object file
+cacheService.cc.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/server.dir/build.make CMakeFiles/server.dir/cacheService.cc.o
+.PHONY : cacheService.cc.o
+
+cacheService.i: cacheService.cc.i
+.PHONY : cacheService.i
+
+# target to preprocess a source file
+cacheService.cc.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/server.dir/build.make CMakeFiles/server.dir/cacheService.cc.i
+.PHONY : cacheService.cc.i
+
+cacheService.s: cacheService.cc.s
+.PHONY : cacheService.s
+
+# target to generate assembly for a file
+cacheService.cc.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/server.dir/build.make CMakeFiles/server.dir/cacheService.cc.s
+.PHONY : cacheService.cc.s
+
 main.o: main.cc.o
 .PHONY : main.o
 
@@ -267,6 +291,9 @@ help:
 	@echo "... PageProcessor.o"
 	@echo "... PageProcessor.i"
 	@echo "... PageProcessor.s"
+	@echo "... cacheService.o"
+	@echo "... cacheService.i"
+	@echo "... cacheService.s"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"
